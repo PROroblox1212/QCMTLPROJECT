@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ERLC — Panel Modération</title>
   <style>
     :root{
@@ -40,29 +40,35 @@
 
     /* reason buttons */
     .reasons{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-    .reason{background:#12203b;border:1px solid #1f2d51;border-radius:12px;padding:12px 14px;text-align:left;cursor:pointer;font-size:17px}
-    .reason small{display:block;color:var(--muted);margin-top:6px;font-size:15px}
+    .reason{background:#12203b;border:1px solid #1f2d51;border-radius:12px;padding:12px 14px;text-align:left;cursor:pointer;font-size:17px;display:flex;flex-direction:column;align-items:flex-start}
+    .reason small{display:block;color:var(--muted);margin-top:8px;font-size:13px}
     .reason[disabled]{opacity:.45;cursor:not-allowed;filter:grayscale(20%)}
+    .reason.active{border-color:var(--accent);background:#163152}
+
+    /* basket / controls */
+    .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+    .basket{background:#071126;border:1px solid #203a57;border-radius:12px;padding:10px 12px;font-size:16px;min-width:260px}
+    .smallbtn{background:#1b2c4f;color:#e8f0ff;border:1px solid #2b4473;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px}
+
+    /* composer */
+    .guide{margin-top:10px;background:#0f1629;border:1px dashed #263152;border-radius:14px;padding:14px 16px;color:#cfe0ff;font-size:16px}
+    .composer{margin:16px 0 6px;display:flex;gap:8px;flex-wrap:wrap}
+    textarea{width:100%;min-height:100px;background:#0f1629;color:var(--text);border:1px solid #1c2742;border-radius:12px;padding:12px 14px;font-size:16px}
+    .btn{background:#1b2c4f;color:#e8f0ff;border:1px solid #2b4473;border-radius:12px;padding:12px 16px;cursor:pointer;font-size:16px}
 
     /* toast */
     .toast{position:fixed;inset:auto 16px 16px auto;background:#0f1629;color:#e5f0ff;border:1px solid #274177;border-radius:12px;padding:12px 16px;box-shadow:0 10px 28px rgba(0,0,0,.35);opacity:0;transform:translateY(8px);transition:all .2s;font-size:16px}
     .toast.show{opacity:1;transform:none}
 
-    /* guide card */
-    .guide{margin-top:10px;background:#0f1629;border:1px dashed #263152;border-radius:14px;padding:14px 16px;color:#cfe0ff;font-size:16px}
-    .guide b{color:#fff}
-
-    /* composer */
-    .composer{margin:16px 0 6px;display:flex;gap:8px;flex-wrap:wrap}
-    textarea{width:100%;min-height:100px;background:#0f1629;color:var(--text);border:1px solid #1c2742;border-radius:12px;padding:12px 14px;font-size:16px}
-    .btn{background:#1b2c4f;color:#e8f0ff;border:1px solid #2b4473;border-radius:12px;padding:12px 16px;cursor:pointer;font-size:16px}
+    /* small helpers */
+    .flex{display:flex;gap:12px;align-items:center}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap" style="text-align:center">
       <h1>📗 ERLC — Panel de Modération</h1>
-      <div class="sub">Warn • Kick • Ban — Copie instantanée des raisons | Zones & permissions intégrées</div>
+      <div class="sub">Warn • Kick • Ban — Sélection multiple + corrections notes</div>
     </div>
   </header>
 
@@ -78,11 +84,15 @@
           <option>Co-fondateur+</option>
         </select>
       </label>
+
       <label class="pill" title="Filtrer par texte">
         <span>🔎 Rechercher</span>
         <input id="search" type="text" placeholder="ex: RDM, exploit, métagaming..." />
       </label>
-      <span class="pill" title="Procédure !mod">🧩 Procédure rapide !mod: Rejoindre, écouter, vérifier, évaluer, sanctionner, noter → Melonly</span>
+
+      <div style="margin-left:auto" class="flex">
+        <div class="pill">🧩 Procédure !mod: Rejoindre • Écouter • Vérifier • Évaluer • Sanctionner • Noter → Melonly</div>
+      </div>
     </div>
 
     <!-- Action tabs -->
@@ -95,9 +105,19 @@
     <!-- Zones injected here -->
     <div id="zones"></div>
 
-    <!-- Composer -->
-    <div class="guide">
-      <b>Rappel zones :</b> 🟡 2–4 warns | 🟠 warn/kick | 🔴 kick/ban (Admin+) | ⚫ ban/blacklist (Co-fondateur+). Cas particulier : <b>:wanted</b> si retrait d’une team par un supérieur.
+    <!-- Basket + actions -->
+    <div class="controls" style="margin-top:8px">
+      <div id="basket" class="basket">Aucune sélection</div>
+      <button id="copyBasket" class="smallbtn">📋 Copier sélection</button>
+      <button id="clearBasket" class="smallbtn">🗑️ Vider sélection</button>
+      <div style="margin-left:auto" class="flex">
+        <button id="copyAll" class="btn">✅ Copier (règles + notes)</button>
+      </div>
+    </div>
+
+    <!-- Guide / Notes -->
+    <div class="guide" style="margin-top:16px">
+      <b>Rappel zones :</b> 🟡 2–4 warns | 🟠 warn/kick | 🔴 kick/ban (Admin+) | ⚫ ban/blacklist (Co-fondateur+). Cas particulier : <b>:wanted</b>
     </div>
 
     <div class="composer">
@@ -109,76 +129,83 @@
   <div id="toast" class="toast">Copié ✅</div>
 
   <script>
-    // ---------- Permissions par zone
-    const roleOrder = ["Modérateur junior","Modérateur","Administrateur+","Co-fondateur+"];
-    const zoneRequirements = {
-      "🟡": "Modérateur junior",
-      "🟠": "Modérateur junior",
-      "🔴": "Administrateur+",
-      "⚫": "Co-fondateur+"
-    };
-
-    // ---------- Données des raisons
+    /***** Données des règles (basées sur ton texte complet) *****/
     const RULES = [
-      {label:"Crime en safezone (spawns/postes/casernes)", zone:"🔴"},
-      {label:"Accès zones intérieures police sans escorte", zone:"🟠"},
-      {label:"Accès zones intérieures casernes sans droit", zone:"🟠"},
-      {label:"Auto-défense HRP (usage abusif)", zone:"🟡"},
-      {label:"Voiding abusif / sans accord", zone:"🟠"},
-      {label:"Refus Crash RP sans accord", zone:"🟡"},
-      {label:"Poursuite sans raison RP sérieuse", zone:"🟠"},
-      {label:"Conduite irréaliste (jumps/sens inverse)", zone:"🟠"},
+      // Zones & Sécurité
+      {label:"Crime en safezone (spawns, postes, casernes)", zone:"🔴"},
+      {label:"Zones intérieures police sans escorte", zone:"🟠"},
+      {label:"Zones intérieures casernes réservées (pompiers)", zone:"🟠"},
+      {label:"Auto-défense HRP sans prévenir mod (usage abusif)", zone:"🟡"},
+      {label:"Voiding sans accord", zone:"🟠"},
+      {label:"Crash RP sans accord (refus)", zone:"🟡"},
+
+      // RP
+      {label:"Fuite sans raison RP sérieuse", zone:"🟠"},
+      {label:"Conduite irréaliste (jumps, sens inverse)", zone:"🟠"},
       {label:"Crashs non joués (NoPain)", zone:"🟡"},
       {label:"Abus de fréquence radio", zone:"🟡"},
-      {label:"Rassemblement HRP", zone:"🟠"},
+      {label:"Rassemblements HRP", zone:"🟠"},
       {label:"Scène prioritaire sans mod", zone:"🟡"},
-      {label:"Véhicule exotique sans autorisation WL", zone:"🟠"},
+      {label:"Véhicule exotique sans WL", zone:"🟠"},
       {label:"Liveries non respectées", zone:"🟡"},
-      {label:"Refus de RP sans raison valable", zone:"🟠"},
+      {label:"Refus de RP sans raison valide", zone:"🟠"},
       {label:"Troll / NITRP", zone:"🟠"},
       {label:"Interférence de scène RP/staff", zone:"🟡"},
-      {label:"Metagaming", zone:"🟠"},
-      {label:"Corruption RP dans services publics", zone:"🟠"},
-      {label:"Avatar irréaliste", zone:"🟠"},
-      {label:"GTA driving", zone:"🟠"},
+      {label:"Metagaming (info hors RP)", zone:"🟠"},
+      {label:"Corruption RP (police, pompier, paramédic, MTQ)", zone:"🟠"},
+      {label:"Avatar irréaliste (costumes/têtes/peau)", zone:"🟠"},
+      {label:"GTA driving (aucune règle de la route)", zone:"🟠"},
       {label:"Bloquer la route sans raison métier", zone:"🟠"},
-      {label:"MTQ: ne laisse pas 1 voie par côté", zone:"🟠"},
-      {label:"Abus d’outils (cones/stopsticks/taser…)", zone:"🟠"},
+      {label:"MTQ: ne pas laisser 1 voie par côté", zone:"🟠"},
+
+      // Armes & Outils
+      {label:"Abus d'outils (cones, stopsticks, taser...)", zone:"🟠"},
       {label:"Arme incohérente avec rôle", zone:"🟡"},
       {label:"Gun motions", zone:"🟡"},
-      {label:"Cuff motions correct (info)", zone:"🟡"},
-      {label:"Cuff rush interdit", zone:"🟠"},
-      {label:"RDM", zone:"🟠"},
-      {label:"RDM en safezone", zone:"🔴"},
-      {label:"RDM sur staff", zone:"🔴"},
-      {label:"VDM (heurter exprès)", zone:"🟠"},
+      {label:"Cuff motions (utilisation correcte)", zone:"🟡"},
+      {label:"Cuff rush (interdit si pas de raison/armé/mobilité)", zone:"🟠"},
+
+      // Combat
+      {label:"RDM (attaque sans avertissement)", zone:"🟠"},
+      {label:"RDM en safezone (instant ban)", zone:"🔴"},
+      {label:"RDM sur staff (instant ban)", zone:"🔴"},
+      {label:"VDM (heurter exprès avec véhicule)", zone:"🟠"},
       {label:"FRP (irréalisme)", zone:"🟠"},
       {label:"Powergaming/FearRP/NoPain", zone:"🟠"},
-      {label:"Car surfing", zone:"🟠"},
-      {label:"NLR (retour scène après mort)", zone:"🟠"},
-      {label:"Partenaires de crime >2 sans perm gang", zone:"🟠"},
+      {label:"Car surfing (sauter sur véhicule)", zone:"🟠"},
+      {label:"NLR (retour sur scène après mort)", zone:"🟠"},
+      {label:"Partenaires de crime >2 sans permission gang", zone:"🟠"},
+
+      // Abus du système
       {label:"Gang/Entreprise sans autorisation", zone:"🟠"},
       {label:"TOS Roblox (contenu NSFW/choquant)", zone:"🟠"},
-      {label:"Combat log (quitter pour éviter)", zone:"🟠"},
-      {label:"Fausse identité (uniforme/véhicule)", zone:"🟠"},
+      {label:"Combat log (quitter pour éviter scène)", zone:"🟠"},
+      {label:"Fausse identité (uniforme/véhicule non autorisé)", zone:"🟠"},
       {label:"Impersonation staff", zone:"🔴"},
-      {label:"Évasion staff", zone:"🔴"},
+      {label:"Évasion staff (quitter pour éviter sanction)", zone:"🔴"},
       {label:"Évasion de ban (alt)", zone:"⚫"},
-      {label:"Menaces serveur/joueur", zone:"⚫"},
-      {label:"Abus staff (mauvais canal)", zone:"🟡"},
-      {label:"Musique/soundboard/voice changer", zone:"🟡"},
+      {label:"Menaces serveur/joueur (DDoS, Dox, pub malveillante)", zone:"⚫"},
+      {label:"Abus staff (signaler via ticket)", zone:"🟡"},
+      {label:"Musique / soundboard / voice changer sans autorisation", zone:"🟡"},
       {label:"Appel mod inutile", zone:"🟡"},
-      {label:"Refus décisions du staff", zone:"🟠"},
-      {label:"Manque de respect/harcèlement", zone:"🔴"},
-      {label:"Spam/ping/pub sans autorisation", zone:"🟠"},
+
+      // Règles générales Discord & jeu
+      {label:"Refuser décisions du staff", zone:"🟠"},
+      {label:"Manque de respect / harcèlement", zone:"🔴"},
+      {label:"Spam / ping / pub sans autorisation", zone:"🟠"},
       {label:"Contenu NSFW ou choquant", zone:"🟠"},
       {label:"Débats HRP", zone:"🟡"},
-      {label:"Abus bots/tickets", zone:"🟠"},
-      {label:"Usurpation/double compte", zone:"🟠"},
+      {label:"Abus bots / tickets", zone:"🟠"},
+      {label:"Usurpation / double compte", zone:"🟠"},
       {label:"DM non sollicités", zone:"🟠"},
-      {label:"Mauvais salons", zone:"🟡"},
+      {label:"Mauvais salons (mauvaise section)", zone:"🟡"},
       {label:"Partage privé sans accord", zone:"🔴"},
       {label:"Contournement sanction", zone:"🔴"},
+
+      // Exemples précis demandés par toi (fréquemment utilisés)
+      {label:"GTA driving", zone:"🟠"},
+      {label:"Cuff Rush", zone:"🟠"},
+      {label:"RDM staff", zone:"🔴"}
     ];
 
     const ZONE_INFO = {
@@ -188,76 +215,120 @@
       "⚫": {name:"Zone noire – Très grave", cls:"k", hint:"ban ou blacklist (Co-fondateur+)"}
     };
 
-    const ACTIONS = {
-      WARN: ["🟡","🟠","🔴"],
-      KICK: ["🟠","🔴"],
-      BAN:  ["🔴","⚫"],
-    };
+    const ACTIONS = {WARN:["🟡","🟠","🔴"], KICK:["🟠","🔴"], BAN:["🔴","⚫"]};
+    const roleOrder = ["Modérateur junior","Modérateur","Administrateur+","Co-fondateur+"];
+    const zoneRequirements = {"🟡":"Modérateur junior","🟠":"Modérateur junior","🔴":"Administrateur+","⚫":"Co-fondateur+"};
 
+    // DOM refs
     const roleSel = document.getElementById('role');
     const search = document.getElementById('search');
     const zonesHost = document.getElementById('zones');
     const tabs = [...document.querySelectorAll('.tab')];
     const toast = document.getElementById('toast');
-    let currentAction = 'WARN';
+    const basketEl = document.getElementById('basket');
 
-    tabs.forEach(t=>t.addEventListener('click',()=>{
-      tabs.forEach(x=>x.classList.remove('active'));
-      t.classList.add('active');
-      currentAction = t.dataset.tab;
-      render();
-    }));
+    let currentAction = 'WARN';
+    let basket = []; // list of labels selected
+
+    // Tab handling
+    tabs.forEach(t=>{
+      t.addEventListener('click', ()=>{
+        tabs.forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        currentAction = t.dataset.tab;
+        render();
+      });
+    });
 
     roleSel.addEventListener('change', render);
     search.addEventListener('input', render);
 
-    document.getElementById('copyNote').addEventListener('click',()=>{
+    // Copy note button
+    document.getElementById('copyNote').addEventListener('click', ()=>{
       const txt = document.getElementById('note').value.trim();
-      if(!txt){ return pop("Rien à copier"); }
-      copy(txt);
+      if(!txt) return pop("Rien à copier");
+      const fixed = fixNotes(txt);
+      copyToClipboard(fixed);
     });
 
+    // Copy basket
+    document.getElementById('copyBasket').addEventListener('click', ()=>{
+      if(basket.length===0) return pop("Aucune sélection");
+      const text = basket.join(" I ");
+      copyToClipboard(text);
+    });
+
+    // Clear basket
+    document.getElementById('clearBasket').addEventListener('click', ()=>{
+      basket = [];
+      updateBasket();
+      // remove active class from all reason buttons
+      document.querySelectorAll('.reason').forEach(btn => btn.classList.remove('active'));
+      pop("Sélection vidée");
+    });
+
+    // Copy all (action + basket + notes)
+    document.getElementById('copyAll').addEventListener('click', ()=>{
+      const selected = basket.slice();
+      const notesRaw = document.getElementById('note').value.trim();
+      const notesFixed = notesRaw ? fixNotes(notesRaw) : '';
+      const action = currentAction.toUpperCase();
+      const reasonsPart = selected.length ? selected.join(" I ") : "Aucune raison sélectionnée";
+      const final = action + " | " + reasonsPart + (notesFixed ? " — Notes: " + notesFixed : "");
+      copyToClipboard(final);
+    });
+
+    // Utility: check if zone allowed for current role
     function isAllowed(zone, role){
       const need = zoneRequirements[zone];
       return roleOrder.indexOf(role) >= roleOrder.indexOf(need);
     }
 
+    // Render zones and rules
     function render(){
       const role = roleSel.value;
       const q = search.value.toLowerCase();
       zonesHost.innerHTML = '';
-
       const zonesToShow = ACTIONS[currentAction];
+
       zonesToShow.forEach(z => {
         const info = ZONE_INFO[z];
-        const sec = document.createElement('section');
-        sec.className = 'zone';
+        const sec = document.createElement('section'); sec.className = 'zone';
 
-        const head = document.createElement('div');
-        head.className = 'zonehead';
-        const badge = document.createElement('span');
-        badge.className = 'badge '+info.cls;
-        badge.textContent = z;
-        const title = document.createElement('div');
-        title.innerHTML = `<b>${info.name}</b> · <span class="need">${info.hint}</span>`;
+        // header
+        const head = document.createElement('div'); head.className = 'zonehead';
+        const badge = document.createElement('span'); badge.className = 'badge '+info.cls; badge.textContent = z;
+        const title = document.createElement('div'); title.innerHTML = `<b>${info.name}</b> · <span class="need">${info.hint}</span>`;
         head.appendChild(badge); head.appendChild(title);
         sec.appendChild(head);
 
-        const grid = document.createElement('div');
-        grid.className = 'reasons';
+        // grid reasons
+        const grid = document.createElement('div'); grid.className = 'reasons';
 
-        RULES.filter(r => r.zone===z && (!q || r.label.toLowerCase().includes(q)))
+        RULES.filter(r => r.zone === z && (!q || r.label.toLowerCase().includes(q)))
              .forEach(r => {
                const btn = document.createElement('button');
                btn.className = 'reason';
                const allowed = isAllowed(r.zone, role);
                btn.disabled = !allowed;
-               btn.innerHTML = `${r.label} <small>${allowed? 'Cliquer pour copier' : 'Non autorisé pour votre grade'}</small>`;
-               btn.addEventListener('click',()=>{
+               const isSelected = basket.includes(r.label);
+               if(isSelected) btn.classList.add('active');
+
+               btn.innerHTML = `<div style="font-weight:600">${r.label}</div><small>${allowed? 'Cliquer pour ajouter/supprimer' : 'Réservé pour grade supérieur'}</small>`;
+
+               btn.addEventListener('click', ()=>{
                  if(!allowed) return;
-                 const text = `${currentAction} | ${r.label} | ${r.zone}`;
-                 copy(text);
+                 // toggle selection
+                 if(basket.includes(r.label)){
+                   basket = basket.filter(x=>x!==r.label);
+                   btn.classList.remove('active');
+                 } else {
+                   basket.push(r.label);
+                   btn.classList.add('active');
+                 }
+                 updateBasket();
                });
+
                grid.appendChild(btn);
              });
 
@@ -265,28 +336,53 @@
         zonesHost.appendChild(sec);
       });
 
-      if(currentAction==='WARN'){
-        const special = document.createElement('section');
-        special.className='zone';
+      // special cas : wanted (only on WARN tab)
+      if(currentAction === 'WARN'){
+        const special = document.createElement('section'); special.className = 'zone';
         special.innerHTML = `
           <div class="zonehead"><span class="badge w">⚪</span>
           <div><b>Cas particulier</b> · <span class="need">Un supérieur veut retirer un joueur d’une team → <b>:wanted</b></span></div></div>
           <div class="reasons">
-            <button class="reason" id="wantedBtn">Insérer ":wanted"</button>
+            <button class="reason" id="wantedBtn">Insérer ":wanted" <small>Cliquer pour ajouter/supprimer</small></button>
           </div>`;
         zonesHost.appendChild(special);
-        special.querySelector('#wantedBtn').addEventListener('click',()=>copy(':wanted'));
+        // wanted button handler
+        special.querySelector('#wantedBtn').addEventListener('click', (e)=>{
+          const label = ':wanted';
+          const btn = e.currentTarget;
+          if(basket.includes(label)){ basket = basket.filter(x=>x!==label); btn.classList.remove('active'); }
+          else { basket.push(label); btn.classList.add('active'); }
+          updateBasket();
+        });
       }
+      updateBasket();
     }
 
-    function copy(text){
-      navigator.clipboard.writeText(text).then(()=>pop(`Copié: ${text}`));
+    // Update basket element
+    function updateBasket(){
+      basketEl.textContent = basket.length ? basket.join(" I ") : "Aucune sélection";
+    }
+
+    // Fix notes: trim, collapse spaces, ensure punctuation spacing, capitalize sentence starts
+    function fixNotes(text){
+      text = text.replace(/\s+/g, ' ').trim();                       // collapse spaces
+      text = text.replace(/\s+([?.!,;:])/g, '$1');                    // remove space before punctuation
+      // capitalize first letter after sentence start (simple)
+      text = text.replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase());
+      return text;
+    }
+
+    // copy helper + toast
+    function copyToClipboard(text){
+      navigator.clipboard.writeText(text).then(()=>pop("Copié dans le presse-papier ✅"))
+                                       .catch(()=>pop("Impossible de copier — vérifie le navigateur"));
     }
     function pop(msg){
       toast.textContent = msg; toast.classList.add('show');
-      setTimeout(()=>toast.classList.remove('show'),1400);
+      setTimeout(()=>toast.classList.remove('show'),1500);
     }
 
+    // initial render
     render();
   </script>
 </body>
