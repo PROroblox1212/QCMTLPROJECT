@@ -1,359 +1,116 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ERLC — Panel Modération</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maintenance en cours</title>
   <style>
-    :root{
-      --bg:#0b1220; --card:#11182a; --muted:#97a3b6; --text:#eef2ff; --accent:#5b9dff;
-      --yellow:#fde047; --orange:#fb923c; --red:#ef4444; --black:#0b0b0b; --white:#f3f4f6;
-      --ok:#22c55e; --warn:#f59e0b; --ring:rgba(91,157,255,.25);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#0b1220,#0a1224 40%,#08101f);color:var(--text);font:18px/1.5 system-ui,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
-    header{padding:28px 16px 0;display:flex;align-items:center;justify-content:center}
-    .wrap{max-width:1100px;margin:0 auto;padding:16px}
-    h1{font-size:32px;margin:0 0 4px;letter-spacing:.2px}
-    .sub{color:var(--muted);font-size:15px}
-
-    .top{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0}
-    select, input[type="text"]{background:#0f1629;color:var(--text);border:1px solid #1c2742;border-radius:12px;padding:12px 14px;outline:none;font-size:16px}
-    select:focus, input:focus{box-shadow:0 0 0 4px var(--ring)}
-    .pill{background:#0f1629;border:1px solid #1c2742;border-radius:999px;padding:10px 14px;display:inline-flex;gap:8px;align-items:center;font-size:16px}
-    
-    .tabs{display:flex;gap:12px;margin:10px 0 18px}
-    .tab{flex:1;background:#0f1629;border:1px solid #1c2742;border-radius:14px;padding:16px 20px;text-align:center;cursor:pointer;font-weight:700;letter-spacing:.5px;transition:transform .06s ease;font-size:18px}
-    .tab:hover{transform:translateY(-1px)}
-    .tab.active{background:#152246;border-color:#2a416f;box-shadow:0 6px 24px rgba(0,0,0,.25), inset 0 0 0 1px #355492}
-
-    .zone{background:var(--card);border:1px solid #1b243b;border-radius:16px;padding:16px 16px 12px;margin:12px 0}
-    .zonehead{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:18px}
-    .badge{font-weight:800;border-radius:10px;padding:8px 12px;color:#0b1020;font-size:15px}
-    .y{background:var(--yellow)} .o{background:var(--orange);color:#140a00} .r{background:var(--red);color:#1b0000}
-    .k{background:#222;color:#fafafa;border:1px solid #444}
-    .w{background:var(--white);color:#0b0f1a;border:1px solid #d1d5db}
-    .need{font-size:14px;color:var(--muted)}
-
-    .reasons{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-    .reason{background:#12203b;border:1px solid #1f2d51;border-radius:12px;padding:12px 14px;text-align:left;cursor:pointer;font-size:17px;display:flex;flex-direction:column;align-items:flex-start;color:#56ffff;position:relative}
-    .reason small{display:block;color:var(--muted);margin-top:8px;font-size:13px}
-    .reason.active{border-color:var(--accent);background:#163152}
-
-    .fav-btn{
-      position:absolute;
-      top:6px;right:6px;
-      background:none;
-      border:none;
-      cursor:pointer;
-      font-size:16px;
-      color:#ffd700;
-    }
-
-    .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
-    .basket{background:#071126;border:1px solid #203a57;border-radius:12px;padding:10px 12px;font-size:16px;min-width:260px}
-    .smallbtn{background:#1b2c4f;color:#e8f0ff;border:1px solid #2b4473;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px}
-
-    .guide{margin-top:10px;background:#0f1629;border:1px dashed #263152;border-radius:14px;padding:14px 16px;color:#cfe0ff;font-size:16px}
-    .composer{margin:16px 0 6px;display:flex;gap:8px;flex-wrap:wrap}
-    textarea{width:100%;min-height:100px;background:#0f1629;color:var(--text);border:1px solid #1c2742;border-radius:12px;padding:12px 14px;font-size:16px}
-    .btn{background:#1b2c4f;color:#e8f0ff;border:1px solid #2b4473;border-radius:12px;padding:12px 16px;cursor:pointer;font-size:16px}
-
-    .toast{position:fixed;inset:auto 16px 16px auto;background:#0f1629;color:#e5f0ff;border:1px solid #274177;border-radius:12px;padding:12px 16px;box-shadow:0 10px 28px rgba(0,0,0,.35);opacity:0;transform:translateY(8px);transition:all .2s;font-size:16px;z-index:999}
-    .toast.show{opacity:1;transform:none}
-
-    .flex{display:flex;gap:12px;align-items:center}
-
-    /* Favoris */
-    .fav-container {
-      position: fixed;
-      top: 120px;
-      width: 160px;
-      background: var(--card);
-      border: 1px solid #1c2742;
-      border-radius: 12px;
-      padding: 10px;
-      font-size: 14px;
+    body {
+      margin: 0;
+      height: 100vh;
       display: flex;
+      justify-content: center;
+      align-items: center;
       flex-direction: column;
-      gap: 8px;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
     }
-    #favLeft { left: 10px; }
-    #favRight { right: 10px; }
-    .fav-item {
-      background:#0f1629;
-      border:1px solid #1c2742;
-      border-radius:8px;
-      padding:6px 8px;
-      cursor:pointer;
-      font-size:14px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
-    .fav-item span { flex:1; }
-    .fav-remove {
-      background:none;
-      border:none;
-      color:#ef4444;
-      font-weight:bold;
-      cursor:pointer;
-      margin-left:6px;
+
+    h1 {
+      font-size: 4rem;
+      margin: 0;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    p {
+      font-size: 1.3rem;
+      margin-top: 10px;
+      opacity: 0.95;
+    }
+
+    .status {
+      font-size: 1.6rem;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #ffcc00;
+    }
+
+    .reason {
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 600px;
+      font-size: 1.1rem;
+      line-height: 1.6rem;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    .countdown {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      opacity: 0.85;
+    }
+
+    .loader {
+      margin-top: 30px;
+      border: 6px solid rgba(255, 255, 255, 0.2);
+      border-top: 6px solid #ffffff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap" style="text-align:center">
-      <h1>📗 ERLC — Panel de Modération</h1>
-      <div class="sub">Warn • Kick • Ban — Sélection multiple + corrections notes</div>
-    </div>
-  </header>
+  <h1>🚧 MAINTENANCE EN COURS 🚧</h1>
+  <p>Le site sera de retour dans moins d'une minute.</p>
 
-  <main class="wrap">
-    <div class="top">
-      <label class="pill" title="Grade courant">
-        <span>🎚️ Grade</span>
-        <select id="role">
-          <option>Modérateur junior</option>
-          <option>Modérateur</option>
-          <option selected>Administrateur+</option>
-          <option>Co-fondateur+</option>
-        </select>
-      </label>
-      <label class="pill" title="Filtrer par texte">
-        <span>🔎 Rechercher</span>
-        <input id="search" type="text" placeholder="ex: RDM, exploit, métagaming..." />
-      </label>
-      <div style="margin-left:auto" class="flex">
-        <div class="pill">🧩 Procédure !mod: Rejoindre • Écouter • Vérifier • Évaluer • Sanctionner • Noter → Melonly</div>
-      </div>
-    </div>
+  <div class="status" id="statusText">Mise à jour en cours...</div>
 
-    <div class="tabs">
-      <div class="tab active" data-tab="WARN">WARN</div>
-      <div class="tab" data-tab="KICK">KICK</div>
-      <div class="tab" data-tab="BAN">BAN</div>
-    </div>
+  <div class="reason" id="reasonText">
+    🔧 Correction de bugs en cours. Le programme va bientôt redémarrer. Merci de votre patience !
+  </div>
 
-    <div id="zones"></div>
+  <div class="countdown" id="countdown">Rafraîchissement dans 30s</div>
 
-    <div class="controls" style="margin-top:8px">
-      <div id="basket" class="basket">Aucune sélection</div>
-      <button id="copyBasket" class="smallbtn">📋 Copier sélection</button>
-      <button id="clearBasket" class="smallbtn">🗑️ Vider sélection</button>
-      <div style="margin-left:auto" class="flex">
-        <button id="copyAll" class="btn">✅ Copier (règles + notes)</button>
-      </div>
-    </div>
-
-    <div class="guide" style="margin-top:16px">
-      <b>Rappel zones :</b> 🟡 2–4 warns | 🟠 warn/kick | 🔴 kick/ban (Admin+) | ⚫ ban/blacklist (Co-fondateur+). Cas particulier : <b>:wanted</b>
-    </div>
-
-    <div class="composer">
-      <textarea id="note" placeholder="Notes (preuve, ID, contexte, durée, etc.)"></textarea>
-      <button class="btn" id="copyNote">Copier la note</button>
-    </div>
-  </main>
-
-  <!-- Conteneurs favoris -->
-  <div id="favLeft" class="fav-container"></div>
-  <div id="favRight" class="fav-container"></div>
-
-  <div id="toast" class="toast">Copié ✅</div>
+  <div class="loader"></div>
 
   <script>
-    /* --------------------- DONNÉES --------------------- */
-    const RULES = [
-      {label:"Crime en safezone (spawns, postes, casernes)", zone:"🟡"},
-      {label:"Zones intérieures police sans escorte", zone:"🟠"},
-      {label:"Zones intérieures casernes réservées (pompiers)", zone:"🟠"},
-      {label:"Auto-défense HRP sans prévenir mod (usage abusif)", zone:"🟡"},
-      {label:"Voiding sans accord", zone:"🟠"},
-      {label:"Crash RP sans accord (refus)", zone:"🟡"},
-      {label:"Fuite sans raison RP sérieuse", zone:"🟠"},
-      {label:"Conduite irréaliste (jumps, sens inverse)", zone:"🟠"},
-      {label:"Crashs non joués (NoPain)", zone:"🟡"},
-      {label:"Abus de fréquence radio", zone:"🟡"},
-      {label:"Rassemblements HRP", zone:"🟠"},
-      {label:"Scène prioritaire sans mod", zone:"🟡"},
-      {label:"Véhicule exotique sans WL", zone:"🟠"},
-      {label:"Liveries non respectées", zone:"🟡"},
-      {label:"Refus de RP sans raison valide", zone:"🟠"},
-      {label:"Troll / NITRP", zone:"🟠"},
-      {label:"Interférence de scène RP/staff", zone:"🟡"},
-      {label:"Metagaming (info hors RP)", zone:"🟠"},
-      {label:"Corruption RP (police, pompier, paramédic, MTQ)", zone:"🟠"},
-      {label:"Avatar irréaliste (costumes/têtes/peau)", zone:"🟠"},
-      {label:"GTA driving (aucune règle de la route)", zone:"🟠"},
-      {label:"Bloquer la route sans raison métier", zone:"🟠"},
-      {label:"MTQ: ne pas laisser 1 voie par côté", zone:"🟠"},
-      {label:"Abus d'outils (cones, stopsticks, taser...)", zone:"🟠"},
-      {label:"Arme incohérente avec rôle", zone:"🟡"},
-      {label:"Gun motions", zone:"🟡"},
-      {label:"Cuff motions (utilisation correcte)", zone:"🟡"},
-      {label:"Cuff rush (interdit si pas de raison/armé/mobilité)", zone:"🟠"},
-      {label:"RDM (attaque sans avertissement)", zone:"🟠"},
-      {label:"RDM en safezone (instant ban)", zone:"🔴"},
-      {label:"RDM sur staff (instant ban)", zone:"🔴"},
-      {label:"VDM (heurter exprès avec véhicule)", zone:"🟠"},
-      {label:"FRP (irréalisme)", zone:"🟠"},
-      {label:"Powergaming/FearRP/NoPain", zone:"🟠"},
-      {label:"Car surfing (sauter sur véhicule)", zone:"🟠"},
-      {label:"NLR (retour sur scène après mort)", zone:"🟠"},
-      {label:"Partenaires de crime >2 sans permission gang", zone:"🟠"},
-      {label:"Gang/Entreprise sans autorisation", zone:"🟠"},
-      {label:"TOS Roblox (contenu NSFW/choquant)", zone:"🟠"},
-      {label:"Combat log (quitter pour éviter scène)", zone:"🟠"},
-      {label:"Fausse identité (uniforme/véhicule non autorisé)", zone:"🟠"},
-      {label:"Impersonation staff", zone:"🔴"},
-      {label:"Évasion staff (quitter pour éviter sanction)", zone:"🔴"},
-      {label:"Évasion de ban (alt)", zone:"⚫"},
-      {label:"Menaces serveur/joueur (DDoS, Dox, pub malveillante)", zone:"⚫"},
-      {label:"Abus staff (signaler via ticket)", zone:"🟡"},
-      {label:"Musique / soundboard / voice changer sans autorisation", zone:"🟡"},
-      {label:"Appel mod inutile", zone:"🟡"},
-      {label:"Refuser décisions du staff", zone:"🟠"},
-      {label:"Manque de respect / harcèlement", zone:"🔴"},
-      {label:"Spam / ping / pub sans autorisation", zone:"🟠"},
-      {label:"Contenu NSFW ou choquant", zone:"🟠"},
-      {label:"Débats HRP", zone:"🟡"},
-      {label:"Abus bots / tickets", zone:"🟠"},
-      {label:"Usurpation / double compte", zone:"🟠"},
-      {label:"DM non sollicités", zone:"🟠"},
-      {label:"Mauvais salons (mauvaise section)", zone:"🟡"},
-      {label:"Partage privé sans accord", zone:"🔴"},
-      {label:"Contournement sanction", zone:"🔴"},
-      {label:"GTA driving", zone:"🟠"},
-      {label:"Cuff Rush", zone:"🟠"},
-      {label:"RDM staff", zone:"🔴"},
-      {label:"Anglais,", zone:"🔴"}
-    ];
+    let seconds = 30;
+    const countdown = document.getElementById("countdown");
 
-    const ZONE_INFO = {
-      "🟡": {name:"Zone jaune – Mineure", cls:"y", hint:"2–4 warns"},
-      "🟠": {name:"Zone orange – Moyenne", cls:"o", hint:"warn ou kick"},
-      "🔴": {name:"Zone rouge – Grave", cls:"r", hint:"kick ou ban (Admin+)"},
-      "⚫": {name:"Zone noire – Très grave", cls:"k", hint:"ban ou blacklist (Co-fondateur+)"}
-    };
+    const timer = setInterval(() => {
+      countdown.textContent = `Rafraîchissement dans ${seconds}s`;
+      seconds--;
 
-    const ACTIONS = {WARN:["🟡","🟠","🔴"], KICK:["🟠","🔴"], BAN:["🔴","⚫"]};
-    const roleOrder = ["Modérateur junior","Modérateur","Administrateur+","Co-fondateur+"];
-    const zoneRequirements = {"🟡":"Modérateur junior","🟠":"Modérateur junior","🔴":"Administrateur+","⚫":"Co-fondateur+"};
-
-    const roleSel = document.getElementById('role');
-    const search = document.getElementById('search');
-    const zonesHost = document.getElementById('zones');
-    const tabs = [...document.querySelectorAll('.tab')];
-    const toast = document.getElementById('toast');
-    const basketEl = document.getElementById('basket');
-
-    let currentAction = 'WARN';
-    let basket = []; 
-
-    /* --------------------- FAVORIS --------------------- */
-    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-
-    function saveFavorites(){
-      localStorage.setItem("favorites", JSON.stringify(favorites));
-      renderFavorites();
-    }
-
-    function addFavorite(label){
-      if(favorites.length >= 10) { pop("Max 10 favoris"); return; }
-      if(favorites.includes(label)) { pop("Déjà en favoris"); return; }
-      favorites.push(label);
-      saveFavorites();
-      pop("Ajouté aux favoris ✅");
-    }
-
-    function removeFavorite(label){
-      favorites = favorites.filter(f => f !== label);
-      saveFavorites();
-      pop("Favori retiré");
-    }
-
-    function renderFavorites(){
-      const left = document.getElementById("favLeft");
-      const right = document.getElementById("favRight");
-      left.innerHTML = ""; right.innerHTML = "";
-      favorites.forEach((f, i) => {
-        const div = document.createElement("div");
-        div.className = "fav-item";
-        div.innerHTML = `<span>${f}</span><button class="fav-remove">×</button>`;
-        div.onclick = () => toggleBasket(f);
-        div.querySelector("button").onclick = e => { e.stopPropagation(); removeFavorite(f); };
-        if(i < 5) left.appendChild(div);
-        else right.appendChild(div);
-      });
-    }
-
-    /* --------------------- PANNEAU --------------------- */
-    function render(){
-      zonesHost.innerHTML = '';
-      const role = roleSel.value;
-      const filter = search.value.toLowerCase();
-      const zones = {};
-
-      for(const r of RULES){
-        if(!ACTIONS[currentAction].includes(r.zone)) continue;
-        if(filter && !r.label.toLowerCase().includes(filter)) continue;
-        if(roleOrder.indexOf(role) < roleOrder.indexOf(zoneRequirements[r.zone])) continue;
-        (zones[r.zone] ||= []).push(r.label);
+      if (seconds < 0) {
+        clearInterval(timer);
+        location.reload();
       }
-
-      for(const z of ACTIONS[currentAction]){
-        if(!zones[z]) continue;
-        const {name, cls, hint} = ZONE_INFO[z];
-        const sec = document.createElement('div');
-        sec.className = 'zone';
-        sec.innerHTML = `<div class="zonehead"><div class="badge ${cls}">${z}</div><div>${name}</div><div class="need">${hint}</div></div>`;
-        const list = document.createElement('div');
-        list.className = 'reasons';
-        zones[z].forEach(label=>{
-          const card = document.createElement('div');
-          card.className = 'reason';
-          card.innerHTML = label + `<button class="fav-btn" title="Ajouter aux favoris">★</button>`;
-          if(basket.includes(label)) card.classList.add('active');
-          card.onclick = e => { if(e.target.tagName!=="BUTTON") toggleBasket(label); };
-          card.querySelector("button").onclick = e => { e.stopPropagation(); addFavorite(label); };
-          list.appendChild(card);
-        });
-        sec.appendChild(list);
-        zonesHost.appendChild(sec);
-      }
-    }
-
-    function toggleBasket(label){
-      if(basket.includes(label)) basket = basket.filter(x=>x!==label);
-      else basket.push(label);
-      render();
-      updateBasket();
-    }
-
-    function updateBasket(){
-      basketEl.textContent = basket.length ? "Sélection : " + basket.join(', ') : "Aucune sélection";
-    }
-
-    function copy(txt){
-      navigator.clipboard.writeText(txt).then(()=>{toast.textContent="Copié ✅";toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1800);});
-    }
-    function pop(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1800);}
-
-    /* --------------------- INIT --------------------- */
-    tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');currentAction=t.dataset.tab;render();});
-    roleSel.onchange = render;
-    search.oninput = render;
-
-    document.getElementById('copyBasket').onclick=()=>basket.length?copy(basket.join(', ')):pop("Panier vide");
-    document.getElementById('clearBasket').onclick=()=>{basket=[];render();updateBasket();};
-    document.getElementById('copyAll').onclick=()=>{const note=document.getElementById('note').value;copy([basket.join(', '),note].filter(Boolean).join('\n'));};
-    document.getElementById('copyNote').onclick=()=>{const n=document.getElementById('note').value;if(n)copy(n);};
-
-    render();
-    updateBasket();
-    renderFavorites();
+    }, 1000);
   </script>
 </body>
 </html>
